@@ -26,7 +26,33 @@ app.post("/assignments", async (req, res) => {
 });
 
 
+// 2. GET ALL ASSIGNMENTS / FILTER SUBMITTED
+app.get("/assignments", async (req, res) => {
+  const { submitted } = req.query;
 
+  try {
+    let result;
+
+    if (submitted === "true") {
+      result = await pool.query(
+        `SELECT * FROM assignments
+         WHERE submitted = $1
+         ORDER BY id DESC`,
+        [true]
+      );
+    } else {
+      result = await pool.query(
+        `SELECT * FROM assignments
+         ORDER BY id DESC`
+      );
+    }
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 
 app.listen(3000, () => {
